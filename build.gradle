@@ -21,14 +21,14 @@ gocdPlugin {
   id = 'cd.go.authorization.google'
   pluginVersion = '3.1.0'
   goCdVersion = '20.9.0'
-  name = 'Google oauth authorization plugin'
-  description = 'Google oauth authorization plugin for GoCD'
+  name = 'Google IAP authorization plugin'
+  description = 'Google iap authorization plugin for GoCD'
   vendorName = 'ThoughtWorks, Inc.'
-  vendorUrl = 'https://github.com/gocd-contrib/google-oauth-authorization-plugin'
+  vendorUrl = 'https://github.com/getsentry/google-iap-authorization-plugin'
 
   githubRepo {
     owner = System.getenv('GITHUB_USER') ?: 'bob'
-    repo = 'google-oauth-authorization-plugin'
+    repo = 'google-iap-authorization-plugin'
     token = System.getenv('GITHUB_TOKEN') ?: 'bad-token'
   }
 

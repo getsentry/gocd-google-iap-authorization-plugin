@@ -7,8 +7,8 @@
 
 ## Installation
 
-Copy the file `build/libs/google-oauth-authorization-plugin-VERSION.jar` to the GoCD server under `${GO_SERVER_DIR}/plugins/external` 
-and restart the server. The `GO_SERVER_DIR` is usually `/var/lib/go-server` on Linux and `C:\Program Files\Go Server` 
+Copy the file `build/libs/google-iap-authorization-plugin-VERSION.jar` to the GoCD server under `${GO_SERVER_DIR}/plugins/external`
+and restart the server. The `GO_SERVER_DIR` is usually `/var/lib/go-server` on Linux and `C:\Program Files\Go Server`
 on Windows.
 
 ## Configuration
@@ -17,7 +17,7 @@ on Windows.
 
 1. Login to [API credentials](https://console.developers.google.com/apis/credentials)
 2. Click on **_Create credentials_** and select `OAuth Client Id`
-4. Select `Web application` as a Application type 
+4. Select `Web application` as a Application type
 5. Provide appropriate **_Name_** to your api credentials
 6. Specify `http://<<your.go.server.hostname.or.ip>>/go/plugin/cd.go.authorization.google/authenticate` in **_Authorized redirect URIs_**. Click on **_Create_**
 7. Yay!! You have created google api credentials

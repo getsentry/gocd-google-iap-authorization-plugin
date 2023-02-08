@@ -14,4 +14,4 @@
  * limitations under the License.
  */
 
-rootProject.name = 'google-oauth-authorization-plugin'
+rootProject.name = 'google-iap-authorization-plugin'
