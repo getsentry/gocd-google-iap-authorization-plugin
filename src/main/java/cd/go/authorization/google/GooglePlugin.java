@@ -28,6 +28,7 @@ import com.thoughtworks.go.plugin.api.logging.Logger;
 import com.thoughtworks.go.plugin.api.request.GoPluginApiRequest;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 
+import static cd.go.authorization.google.GooglePlugin.LOG;
 import static cd.go.authorization.google.Constants.PLUGIN_IDENTIFIER;
 
 @Extension
@@ -63,7 +64,10 @@ public class GooglePlugin implements GoPlugin {
                     return FetchAccessTokenRequest.from(request).execute();
                 case REQUEST_AUTHENTICATE_USER:
                     return UserAuthenticationRequest.from(request).execute();
+                case REQUEST_IS_VALID_USER:
+                    return IsValidUserRequest.from(request).execute();
                 default:
+                    LOG.warn("Unhandled request: " + request.requestName());
                     throw new UnhandledRequestTypeException(request.requestName());
             }
         } catch (NoSuchRequestHandlerException e) {
