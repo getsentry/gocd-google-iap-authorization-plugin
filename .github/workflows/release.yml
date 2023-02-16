@@ -1,32 +1,48 @@
+name: "Release"
 
-name: Create Stable Release
-
-# Controls when the action will run. Workflow runs when manually triggered using the UI
-# or API.
 on:
   workflow_dispatch:
-    # Inputs the workflow accepts.
     inputs:
-      prerelease:
-        description: 'The release should be an experimental release'
-        default: 'NO'
+      version:
+        description: Version to release (v1.0.0)
         required: true
 
 jobs:
-  build_and_release:
-    runs-on: ubuntu-latest
-    env:
-      GITHUB_USER:  "gocd-contrib"
-      GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-      PRERELEASE:   "${{ github.event.inputs.prerelease }}"
+  release:
+    name: "Release"
+
+    runs-on: "ubuntu-latest"
+
     steps:
       - uses: actions/checkout@v3
+      - uses: gradle/gradle-build-action@v2
+      - run: gradle clean test
+      - run: gradle clean assemble -Dorg.gradle.project.version="${{ github.event.inputs.version }}"
+      - name: "Create release"
+        uses: "actions/github-script@v6"
+        env:
+          VERSION: ${{ github.event.inputs.version }}
         with:
-          fetch-depth: 0
-      - name: Set up JDK
-        uses: actions/setup-java@v3
-        with:
-          java-version: 17
-          distribution: temurin
-      - name: Release
-        run: ./gradlew githubRelease
+          script: |
+            const fs = require('fs');
+            try {
+              const filename = `getsentry-webhook-notifier-${process.env.VERSION}.jar`
+              const release = await github.rest.repos.createRelease({
+                draft: false,
+                generate_release_notes: true,
+                name: process.env.VERSION,
+                owner: context.repo.owner,
+                prerelease: false,
+                repo: context.repo.repo,
+                tag_name: process.env.VERSION,
+              });
+              await github.rest.repos.uploadReleaseAsset({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                release_id: release.data.id,
+                name: filename,
+                data: await fs.readFileSync(`build/libs/${filename}`),
+              });
+            } catch (error) {
+              core.setFailed(error.message);
+            }
