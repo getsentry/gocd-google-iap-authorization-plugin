@@ -15,31 +15,19 @@
  */
 
 apply plugin: 'java'
-apply from: "https://raw.githubusercontent.com/gocd/gocd-plugin-gradle-task-helpers/master/helper.gradle?_=${(int) (new Date().toInstant().epochSecond / 60)}"
 
-gocdPlugin {
-  id = 'cd.go.authorization.google'
-  pluginVersion = '3.1.0'
-  goCdVersion = '20.9.0'
-  name = 'Google IAP authorization plugin'
-  description = 'Google iap authorization plugin for GoCD'
-  vendorName = 'ThoughtWorks, Inc.'
-  vendorUrl = 'https://github.com/getsentry/google-iap-authorization-plugin'
+group = 'net.getsentry.gocd'
 
-  githubRepo {
-    owner = System.getenv('GITHUB_USER') ?: 'bob'
-    repo = 'google-iap-authorization-plugin'
-    token = System.getenv('GITHUB_TOKEN') ?: 'bad-token'
-  }
-
-  pluginProject = project
-
-  prerelease = !"No".equalsIgnoreCase(System.getenv('PRERELEASE'))
-  assetsToRelease = [project.tasks.jar]
-}
-
-group = 'cd.go'
-version = gocdPlugin.fullVersion(project)
+// these values that go into plugin.xml
+project.ext.pluginDesc = [
+        id         : 'net.getsentry.gocd.google-iap-authorization',
+        version    : project.version,
+        goCdVersion: '20.9.0',
+        name       : 'Google IAP authorization',
+        description: 'Allow users to sign in using Google IAP',
+        vendorName : 'sentry.io',
+        vendorUrl  : 'https://github.com/getsentry/gocd-google-iap-authorization-plugin'
+]
 
 repositories {
     mavenCentral()
@@ -51,26 +39,12 @@ java {
     targetCompatibility = JavaVersion.VERSION_11
 }
 
-configurations.all {
-    resolutionStrategy.dependencySubstitution {
-        substitute module("junit:junit") using module("io.quarkus:quarkus-junit4-mock:2.16.1.Final") because "We don't want JUnit 4; but is an unneeded transitive of mockwebserver."
-    }
-}
-
-ext {
-    deps = [
-            gocdPluginApi: 'cd.go.plugin:go-plugin-api:22.3.0',
-    ]
-
-    versions = project.ext.deps.collectEntries { lib, libGav -> [lib, libGav.split(':').last()] }
-}
-
 dependencies {
-    compileOnly project.deps.gocdPluginApi
+    compileOnly group: 'cd.go.plugin', name: 'go-plugin-api', version: project.pluginDesc.goCdVersion
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.10.1'
     implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.9.3'
 
-    testImplementation project.deps.gocdPluginApi
+    testImplementation group: 'cd.go.plugin', name: 'go-plugin-api', version: project.pluginDesc.goCdVersion
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.1.1'
     testImplementation group: 'org.hamcrest', name: 'hamcrest-library', version: '2.2'
     testImplementation group: 'org.skyscreamer', name: 'jsonassert', version: '1.5.1'
@@ -80,6 +54,12 @@ dependencies {
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api'
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params'
     testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine'
+}
+
+configurations.all {
+    resolutionStrategy.dependencySubstitution {
+        substitute module("junit:junit") using module("io.quarkus:quarkus-junit4-mock:2.16.1.Final") because "We don't want JUnit 4; but is an unneeded transitive of mockwebserver."
+    }
 }
 
 test {
