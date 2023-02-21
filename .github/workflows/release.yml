@@ -26,7 +26,7 @@ jobs:
           script: |
             const fs = require('fs');
             try {
-              const filename = `getsentry-webhook-notifier-${process.env.VERSION}.jar`
+              const filename = `google-iap-authorization-plugin-${process.env.VERSION}.jar`
               const release = await github.rest.repos.createRelease({
                 draft: false,
                 generate_release_notes: true,
