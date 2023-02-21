@@ -69,6 +69,14 @@ test {
     }
 }
 
+processResources {
+    from("src/main/resource-templates") {
+        filesMatching('plugin.xml') {
+            expand project.pluginDesc
+        }
+    }
+}
+
 jar {
     from(configurations.runtimeClasspath) {
         into "lib/"
