@@ -19,6 +19,8 @@ package cd.go.authorization.google;
 import cd.go.authorization.google.exceptions.NoSuchRequestHandlerException;
 import cd.go.authorization.google.executors.*;
 import cd.go.authorization.google.requests.*;
+import cd.go.authorization.google.utils.GoogleIAP;
+
 import com.thoughtworks.go.plugin.api.GoApplicationAccessor;
 import com.thoughtworks.go.plugin.api.GoPlugin;
 import com.thoughtworks.go.plugin.api.GoPluginIdentifier;
@@ -48,13 +50,16 @@ public class GooglePlugin implements GoPlugin {
     public GoPluginApiResponse handle(GoPluginApiRequest request) {
         try {
             System.out.println(PREFIX + "Request Name: " + request.requestName());
-            String jwtHeader = request.requestHeaders().get("X-Goog-IAP-JWT-Assertion");
-            System.out.println(PREFIX + "JWT Header: " + jwtHeader);
-            String headers = this.mapToString(request.requestHeaders());
-            String params = this.mapToString(request.requestParameters());
-            System.out.println(PREFIX + "Request Headers: " + headers);
-            System.out.println(PREFIX + "Request Params: " + params);
-            System.out.println(PREFIX + "Request Body: " + request.requestBody());
+            if (GoogleIAP.hasIAPJWT(request)) {
+                System.out.println(PREFIX + "JWT Request");
+                String headers = this.mapToString(request.requestHeaders());
+                String params = this.mapToString(request.requestParameters());
+                System.out.println(PREFIX + "Request Headers: " + headers);
+                System.out.println(PREFIX + "Request Params: " + params);
+                System.out.println(PREFIX + "Request Body: " + request.requestBody());
+            } else {
+                System.out.println(PREFIX + "Request does not have IAP details");
+            }
 
             switch (RequestFromServer.fromString(request.requestName())) {
                 case REQUEST_GET_PLUGIN_ICON:

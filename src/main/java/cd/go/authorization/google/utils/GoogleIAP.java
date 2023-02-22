@@ -21,6 +21,11 @@ public class GoogleIAP {
   private static String JWT_HEADER_KEY = "X-Goog-IAP-JWT-Assertion";
   private static final String IAP_ISSUER_URL = "https://cloud.google.com/iap";
 
+  public static boolean hasIAPJWT(final GoPluginApiRequest request) {
+    String jwt = request.requestHeaders().get(JWT_HEADER_KEY);
+    return jwt != null;
+  }
+
   public static boolean isValidIAPRequest(final Request request, final List<AuthConfig> authConfigs) {
     String jwt = request.requestHeaders().get(JWT_HEADER_KEY);
     if (jwt == null) {
@@ -34,19 +39,16 @@ public class GoogleIAP {
   }
 
   private static boolean verifyJwt(String jwtToken, String expectedAudience) {
-    System.out.println("Validating JWT ==> " + jwtToken);
     TokenVerifier tokenVerifier =
         TokenVerifier.newBuilder().setAudience(expectedAudience).setIssuer(IAP_ISSUER_URL).build();
     try {
       JsonWebToken jsonWebToken = tokenVerifier.verify(jwtToken);
-      System.out.println("Token verified");
-
       // Verify that the token contain subject and email claims
       JsonWebToken.Payload payload = jsonWebToken.getPayload();
-      System.out.println("Is valid payload?" + (payload.getSubject() != null && payload.get("email") != null));
+      return payload.getSubject() != null && payload.get("email") != null;
     } catch (TokenVerifier.VerificationException e) {
       System.out.println("JWT Verification failed: " + e.getMessage());
+      return false;
     }
-    return true;
   }
 }
