@@ -48,7 +48,7 @@ public class GooglePlugin implements GoPlugin {
     public GoPluginApiResponse handle(GoPluginApiRequest request) {
         try {
             System.out.println(PREFIX + "Request Name: " + request.requestName());
-            String jwtHeader = request.requestHeaders().get("x-goog-iap-jwt-assertion");
+            String jwtHeader = request.requestHeaders().get("X-Goog-IAP-JWT-Assertion");
             System.out.println(PREFIX + "JWT Header: " + jwtHeader);
             String headers = this.mapToString(request.requestHeaders());
             String params = this.mapToString(request.requestParameters());
