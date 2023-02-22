@@ -34,6 +34,7 @@ import java.util.Map;
 
 @Extension
 public class GooglePlugin implements GoPlugin {
+    private static String PREFIX = "[IAP Auth] ";
     public static final Logger LOG = Logger.getLoggerFor(GooglePlugin.class);
 
     private GoApplicationAccessor accessor;
@@ -46,12 +47,14 @@ public class GooglePlugin implements GoPlugin {
     @Override
     public GoPluginApiResponse handle(GoPluginApiRequest request) {
         try {
+            System.out.println(PREFIX + "Request Name: " + request.requestName());
+            String jwtHeader = request.requestHeaders().get("x-goog-iap-jwt-assertion");
+            System.out.println(PREFIX + "JWT Header: " + jwtHeader);
             String headers = this.mapToString(request.requestHeaders());
             String params = this.mapToString(request.requestParameters());
-            System.out.println("Request Name: " + request.requestName());
-            System.out.println("Request Headers: " + headers);
-            System.out.println("Request Params: " + params);
-            System.out.println("Request Body: " + request.requestBody());
+            System.out.println(PREFIX + "Request Headers: " + headers);
+            System.out.println(PREFIX + "Request Params: " + params);
+            System.out.println(PREFIX + "Request Body: " + request.requestBody());
 
             switch (RequestFromServer.fromString(request.requestName())) {
                 case REQUEST_GET_PLUGIN_ICON:
@@ -95,7 +98,7 @@ public class GooglePlugin implements GoPlugin {
     public String mapToString(Map<String, String> values) {
         StringBuilder mapAsString = new StringBuilder("{");
         for (String key : values.keySet()) {
-            mapAsString.append(key + "=" + values.get(key) + ",\n");
+            mapAsString.append(key + "=" + values.get(key) + ", ");
         }
         mapAsString.append("}");
         return mapAsString.toString();
