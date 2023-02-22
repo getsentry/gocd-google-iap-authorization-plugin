@@ -28,7 +28,6 @@ import com.thoughtworks.go.plugin.api.logging.Logger;
 import com.thoughtworks.go.plugin.api.request.GoPluginApiRequest;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 
-import static cd.go.authorization.google.GooglePlugin.LOG;
 import static cd.go.authorization.google.Constants.PLUGIN_IDENTIFIER;
 
 @Extension
