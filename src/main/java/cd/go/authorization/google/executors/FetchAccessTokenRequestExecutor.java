@@ -20,6 +20,8 @@ import cd.go.authorization.google.exceptions.NoAuthorizationConfigurationExcepti
 import cd.go.authorization.google.models.GoogleConfiguration;
 import cd.go.authorization.google.models.TokenInfo;
 import cd.go.authorization.google.requests.FetchAccessTokenRequest;
+import cd.go.authorization.google.utils.GoogleIAP;
+
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 
@@ -35,10 +37,12 @@ public class FetchAccessTokenRequestExecutor implements RequestExecutor {
             throw new NoAuthorizationConfigurationException("[Get Access Token] No authorization configuration found.");
         }
 
+        if (!GoogleIAP.isValidIAPRequest(this.request)) {
+            return DefaultGoPluginApiResponse.badRequest("Invalid IAP request");
+        }
+
         final GoogleConfiguration configuration = request.authConfigs().get(0).getConfiguration();
-
         final TokenInfo tokenInfo = configuration.googleApiClient().fetchAccessToken(request.requestParameters());
-
         return DefaultGoPluginApiResponse.success(tokenInfo.toJSON());
     }
 }
