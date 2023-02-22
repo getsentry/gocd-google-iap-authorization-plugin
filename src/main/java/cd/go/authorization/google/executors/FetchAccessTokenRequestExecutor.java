@@ -37,7 +37,7 @@ public class FetchAccessTokenRequestExecutor implements RequestExecutor {
             throw new NoAuthorizationConfigurationException("[Get Access Token] No authorization configuration found.");
         }
 
-        if (!GoogleIAP.isValidIAPRequest(this.request)) {
+        if (!GoogleIAP.isValidIAPRequest(this.request, this.request.authConfigs())) {
             return DefaultGoPluginApiResponse.badRequest("Invalid IAP request");
         }
 
