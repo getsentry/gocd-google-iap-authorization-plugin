@@ -46,8 +46,9 @@ public class GooglePlugin implements GoPlugin {
     @Override
     public GoPluginApiResponse handle(GoPluginApiRequest request) {
         try {
-            String headers = this.requestHeadersString(request);
-            String params = this.requestParametersString(request);
+            String headers = this.mapToString(request.requestHeaders());
+            String params = this.mapToString(request.requestParameters());
+            System.out.println("Request Name: " + request.requestName());
             System.out.println("Request Headers: " + headers);
             System.out.println("Request Params: " + params);
             System.out.println("Request Body: " + request.requestBody());
@@ -91,21 +92,10 @@ public class GooglePlugin implements GoPlugin {
         return PLUGIN_IDENTIFIER;
     }
 
-    private String requestParametersString(GoPluginApiRequest request) {
+    public String mapToString(Map<String, String> values) {
         StringBuilder mapAsString = new StringBuilder("{");
-        Map<String, String> params = request.requestParameters();
-        for (String key : params.keySet()) {
-            mapAsString.append(key + "=" + params.get(key) + ", ");
-        }
-        mapAsString.append("}");
-        return mapAsString.toString();
-    }
-
-    public String requestHeadersString(GoPluginApiRequest request) {
-        StringBuilder mapAsString = new StringBuilder("{");
-        Map<String, String> headers = request.requestHeaders();
-        for (String key : headers.keySet()) {
-            mapAsString.append(key + "=" + headers.get(key) + ", ");
+        for (String key : values.keySet()) {
+            mapAsString.append(key + "=" + values.get(key) + ",\n");
         }
         mapAsString.append("}");
         return mapAsString.toString();
