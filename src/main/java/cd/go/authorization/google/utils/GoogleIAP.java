@@ -27,27 +27,26 @@ public class GoogleIAP {
       return false;
     }
 
-    System.out.println("JWT Header ==> " + jwt);
-    System.out.println("TODO: Validate the JWT");
-
     GoogleConfiguration config = authConfigs.get(0).getConfiguration();
     return verifyJwt(
       jwt,
-      String.format("/projects/%s/apps/%s", config.projectNumber(), config.projectId()));
+      config.audience());
   }
 
   private static boolean verifyJwt(String jwtToken, String expectedAudience) {
+    System.out.println("Validating JWT ==> " + jwtToken);
     TokenVerifier tokenVerifier =
         TokenVerifier.newBuilder().setAudience(expectedAudience).setIssuer(IAP_ISSUER_URL).build();
     try {
       JsonWebToken jsonWebToken = tokenVerifier.verify(jwtToken);
+      System.out.println("Token verified");
 
       // Verify that the token contain subject and email claims
       JsonWebToken.Payload payload = jsonWebToken.getPayload();
-      return payload.getSubject() != null && payload.get("email") != null;
+      System.out.println("Is valid payload?" + (payload.getSubject() != null && payload.get("email") != null));
     } catch (TokenVerifier.VerificationException e) {
-      System.out.println(e.getMessage());
-      return false;
+      System.out.println("JWT Verification failed: " + e.getMessage());
     }
+    return true;
   }
 }

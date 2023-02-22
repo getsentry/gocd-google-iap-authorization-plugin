@@ -110,27 +110,15 @@
     </div>
 
     <div class="form_item_block">
-        <label ng-class="{'is-invalid-label': GOINPUTNAME[ProjectNumber].$error.server}">GCP Project Number:<span class='asterix'>*</span>
+        <label ng-class="{'is-invalid-label': GOINPUTNAME[Audience].$error.server}">GCP Project Number:<span class='asterix'>*</span>
             <div class="tooltip-info">
               <span class="tooltip-content">
                 The project number for the GCP project used with IAP.
               </span>
             </div>
         </label>
-        <input ng-class="{'is-invalid-input': GOINPUTNAME[ProjectNumber].$error.server}" type="password" ng-model="ProjectNumber" ng-required="true"/>
-        <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[ProjectNumber].$error.server}" ng-show="GOINPUTNAME[ProjectNumber].$error.server">{{GOINPUTNAME[ProjectNumber].$error.server}}</span>
-    </div>
-
-    <div class="form_item_block">
-        <label ng-class="{'is-invalid-label': GOINPUTNAME[ProjectId].$error.server}">GCP Project ID:<span class='asterix'>*</span>
-            <div class="tooltip-info">
-              <span class="tooltip-content">
-                The Project ID for the GCP project used with IAP.
-              </span>
-            </div>
-        </label>
-        <input ng-class="{'is-invalid-input': GOINPUTNAME[ProjectId].$error.server}" type="password" ng-model="ProjectId" ng-required="true"/>
-        <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[ProjectId].$error.server}" ng-show="GOINPUTNAME[ProjectId].$error.server">{{GOINPUTNAME[ProjectId].$error.server}}</span>
+        <input ng-class="{'is-invalid-input': GOINPUTNAME[Audience].$error.server}" type="password" ng-model="Audience" ng-required="true"/>
+        <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[Audience].$error.server}" ng-show="GOINPUTNAME[Audience].$error.server">{{GOINPUTNAME[Audience].$error.server}}</span>
     </div>
 
     <div class="form_item_block">

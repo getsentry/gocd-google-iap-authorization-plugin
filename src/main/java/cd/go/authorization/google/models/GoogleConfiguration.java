@@ -42,14 +42,9 @@ public class GoogleConfiguration {
     private String clientSecret;
 
     @Expose
-    @SerializedName("ProjectNumber")
-    @ProfileField(key = "ProjectNumber", required = true, secure = true)
-    private String projectNumber;
-
-    @Expose
-    @SerializedName("ProjectId")
-    @ProfileField(key = "ProjectId", required = true, secure = true)
-    private String projectId;
+    @SerializedName("Audience")
+    @ProfileField(key = "Audience", required = true, secure = true)
+    private String audience;
 
     @Expose
     @SerializedName("AllowedDomains")
@@ -79,12 +74,8 @@ public class GoogleConfiguration {
         return clientSecret;
     }
 
-    public String projectNumber() {
-        return projectNumber;
-    }
-
-    public String projectId() {
-        return projectId;
+    public String audience() {
+        return audience;
     }
 
     public String googleApiUrl() {

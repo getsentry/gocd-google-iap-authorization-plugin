@@ -56,12 +56,8 @@ public class AuthConfigValidateRequestExecutorTest {
                 "    \"key\": \"ClientSecret\"\n" +
                 "  },\n" +
                 "  {\n" +
-                "    \"message\": \"ProjectNumber must not be blank.\",\n" +
-                "    \"key\": \"ProjectNumber\"\n" +
-                "  },\n" +
-                "  {\n" +
-                "    \"message\": \"ProjectId must not be blank.\",\n" +
-                "    \"key\": \"ProjectId\"\n" +
+                "    \"message\": \"Audience must not be blank.\",\n" +
+                "    \"key\": \"Audience\"\n" +
                 "  }\n" +
                 "]";
 
