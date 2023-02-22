@@ -30,6 +30,8 @@ import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 
 import static cd.go.authorization.google.Constants.PLUGIN_IDENTIFIER;
 
+import java.util.Map;
+
 @Extension
 public class GooglePlugin implements GoPlugin {
     public static final Logger LOG = Logger.getLoggerFor(GooglePlugin.class);
@@ -44,6 +46,12 @@ public class GooglePlugin implements GoPlugin {
     @Override
     public GoPluginApiResponse handle(GoPluginApiRequest request) {
         try {
+            String headers = this.requestHeadersString(request);
+            String params = this.requestParametersString(request);
+            System.out.println("Request Headers: " + headers);
+            System.out.println("Request Params: " + params);
+            System.out.println("Request Body: " + request.requestBody());
+
             switch (RequestFromServer.fromString(request.requestName())) {
                 case REQUEST_GET_PLUGIN_ICON:
                     return new GetPluginIconRequestExecutor().execute();
@@ -81,5 +89,25 @@ public class GooglePlugin implements GoPlugin {
     @Override
     public GoPluginIdentifier pluginIdentifier() {
         return PLUGIN_IDENTIFIER;
+    }
+
+    private String requestParametersString(GoPluginApiRequest request) {
+        StringBuilder mapAsString = new StringBuilder("{");
+        Map<String, String> params = request.requestParameters();
+        for (String key : params.keySet()) {
+            mapAsString.append(key + "=" + params.get(key) + ", ");
+        }
+        mapAsString.append("}");
+        return mapAsString.toString();
+    }
+
+    public String requestHeadersString(GoPluginApiRequest request) {
+        StringBuilder mapAsString = new StringBuilder("{");
+        Map<String, String> headers = request.requestHeaders();
+        for (String key : headers.keySet()) {
+            mapAsString.append(key + "=" + headers.get(key) + ", ");
+        }
+        mapAsString.append("}");
+        return mapAsString.toString();
     }
 }
