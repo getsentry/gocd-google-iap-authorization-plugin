@@ -17,8 +17,9 @@
 package cd.go.authorization.google.requests;
 
 import cd.go.authorization.google.executors.UserAuthenticationRequestExecutor;
+import cd.go.authorization.google.jwt.IAPJWTValidator;
 import cd.go.authorization.google.models.AuthConfig;
-import cd.go.authorization.google.models.TokenInfo;
+import cd.go.authorization.google.models.IAPJwt;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.thoughtworks.go.plugin.api.request.GoPluginApiRequest;
@@ -32,7 +33,7 @@ public class UserAuthenticationRequest extends Request {
 
     @Expose
     @SerializedName("credentials")
-    private TokenInfo tokenInfo;
+    private IAPJwt credentials;
 
     public static UserAuthenticationRequest from(GoPluginApiRequest apiRequest) {
         return Request.from(apiRequest, UserAuthenticationRequest.class);
@@ -42,12 +43,12 @@ public class UserAuthenticationRequest extends Request {
         return authConfigs;
     }
 
-    public TokenInfo tokenInfo() {
-        return tokenInfo;
+    public IAPJwt credentials() {
+        return credentials;
     }
 
     @Override
     public UserAuthenticationRequestExecutor executor() {
-        return new UserAuthenticationRequestExecutor(this);
+        return new UserAuthenticationRequestExecutor(this, new IAPJWTValidator());
     }
 }

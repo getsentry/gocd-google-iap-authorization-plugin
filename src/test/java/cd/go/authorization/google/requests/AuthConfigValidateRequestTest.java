@@ -40,9 +40,7 @@ public class AuthConfigValidateRequestTest {
     @Test
     public void shouldDeserializeGoPluginApiRequestToAuthConfigValidateRequest() throws Exception {
         String responseBody = "{\n" +
-                "  \"AllowedDomains\": \"example.com\",\n" +
-                "  \"ClientId\": \"client-id\",\n" +
-                "  \"ClientSecret\": \"client-secret\"\n" +
+                "  \"Audience\": \"project/123/test\"\n" +
                 "}";
 
         when(apiRequest.requestBody()).thenReturn(responseBody);
@@ -50,8 +48,6 @@ public class AuthConfigValidateRequestTest {
         final AuthConfigValidateRequest request = AuthConfigValidateRequest.from(apiRequest);
         final GoogleConfiguration googleConfiguration = request.googleConfiguration();
 
-        assertThat(googleConfiguration.allowedDomains(), Matchers.contains("example.com"));
-        assertThat(googleConfiguration.clientId(), is("client-id"));
-        assertThat(googleConfiguration.clientSecret(), is("client-secret"));
+        assertThat(googleConfiguration.audience(), is("project/123/test"));
     }
 }

@@ -42,10 +42,6 @@ public class User {
         this.emailId = emailId == null ? null : emailId.toLowerCase().trim();
     }
 
-    public User(GoogleUser userProfile) {
-        this(userProfile.getEmail(), userProfile.getName(), userProfile.getEmail());
-    }
-
     public String username() {
         return username;
     }

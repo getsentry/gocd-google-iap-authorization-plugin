@@ -45,31 +45,10 @@ public class GetAuthConfigMetadataRequestExecutorTest {
         assertThat(response.responseCode(), is(200));
         String expectedJSON = "[\n" +
                 "  {\n" +
-                "    \"key\": \"ClientId\",\n" +
-                "    \"metadata\": {\n" +
-                "      \"required\": true,\n" +
-                "      \"secure\": true\n" +
-                "    }\n" +
-                "  },\n" +
-                "  {\n" +
-                "    \"key\": \"ClientSecret\",\n" +
-                "    \"metadata\": {\n" +
-                "      \"required\": true,\n" +
-                "      \"secure\": true\n" +
-                "    }\n" +
-                "  },\n" +
-                "  {\n" +
                 "    \"key\": \"Audience\",\n" +
                 "    \"metadata\": {\n" +
                 "      \"required\": true,\n" +
                 "      \"secure\": true\n" +
-                "    }\n" +
-                "  },\n" +
-                "  {\n" +
-                "    \"key\": \"AllowedDomains\",\n" +
-                "    \"metadata\": {\n" +
-                "      \"required\": false,\n" +
-                "      \"secure\": false\n" +
                 "    }\n" +
                 "  }\n" +
                 "]";

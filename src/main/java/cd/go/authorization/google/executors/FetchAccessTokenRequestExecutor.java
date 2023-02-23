@@ -17,19 +17,22 @@
 package cd.go.authorization.google.executors;
 
 import cd.go.authorization.google.exceptions.NoAuthorizationConfigurationException;
-import cd.go.authorization.google.models.GoogleConfiguration;
-import cd.go.authorization.google.models.TokenInfo;
+import cd.go.authorization.google.jwt.IAPJWTValidator;
+import cd.go.authorization.google.jwt.JWTValidation;
+import cd.go.authorization.google.jwt.JWTValidator;
+import cd.go.authorization.google.models.IAPJwt;
 import cd.go.authorization.google.requests.FetchAccessTokenRequest;
-import cd.go.authorization.google.utils.GoogleIAP;
 
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 
 public class FetchAccessTokenRequestExecutor implements RequestExecutor {
     private final FetchAccessTokenRequest request;
+    private JWTValidator validator;
 
-    public FetchAccessTokenRequestExecutor(FetchAccessTokenRequest request) {
+    public FetchAccessTokenRequestExecutor(FetchAccessTokenRequest request, JWTValidator validator) {
         this.request = request;
+        this.validator = validator;
     }
 
     public GoPluginApiResponse execute() throws Exception {
@@ -37,12 +40,20 @@ public class FetchAccessTokenRequestExecutor implements RequestExecutor {
             throw new NoAuthorizationConfigurationException("[Get Access Token] No authorization configuration found.");
         }
 
-        if (!GoogleIAP.isValidIAPRequest(this.request, this.request.authConfigs())) {
+        String jwt = this.request.requestHeaders().get(IAPJWTValidator.JWT_HEADER_KEY);
+        if (jwt == null) {
             return DefaultGoPluginApiResponse.badRequest("Invalid IAP request");
         }
 
-        final GoogleConfiguration configuration = request.authConfigs().get(0).getConfiguration();
-        final TokenInfo tokenInfo = configuration.googleApiClient().fetchAccessToken(request.requestParameters());
-        return DefaultGoPluginApiResponse.success(tokenInfo.toJSON());
+        JWTValidation validation = validator.validate(
+            jwt,
+            this.request.authConfigs().get(0).getConfiguration().audience()
+        );
+        if (!validation.isValid()) {
+            return DefaultGoPluginApiResponse.badRequest("Invalid IAP request");
+        }
+
+        IAPJwt payload = new IAPJwt(jwt);
+        return DefaultGoPluginApiResponse.success(payload.toJSON());
     }
 }

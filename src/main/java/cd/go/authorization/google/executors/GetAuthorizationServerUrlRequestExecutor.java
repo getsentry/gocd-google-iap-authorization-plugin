@@ -16,7 +16,6 @@
 
 package cd.go.authorization.google.executors;
 
-import cd.go.authorization.google.GoogleApiClient;
 import cd.go.authorization.google.exceptions.NoAuthorizationConfigurationException;
 import cd.go.authorization.google.requests.GetAuthorizationServerUrlRequest;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
@@ -38,8 +37,8 @@ public class GetAuthorizationServerUrlRequestExecutor implements RequestExecutor
             throw new NoAuthorizationConfigurationException("[Authorization Server Url] No authorization configuration found.");
         }
 
-        final GoogleApiClient googleApiClient = request.authConfigs().get(0).getConfiguration().googleApiClient();
-
-        return DefaultGoPluginApiResponse.success(GSON.toJson(Collections.singletonMap("authorization_server_url", googleApiClient.authorizationServerUrl(request.callbackUrl()))));
+        // We don't need a web redirect because IAP is doing the auth for us already, so redirect the user
+        // directly to the callback URL.
+        return DefaultGoPluginApiResponse.success(GSON.toJson(Collections.singletonMap("authorization_server_url", request.callbackUrl())));
     }
 }

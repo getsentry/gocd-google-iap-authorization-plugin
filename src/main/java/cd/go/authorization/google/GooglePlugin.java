@@ -18,8 +18,8 @@ package cd.go.authorization.google;
 
 import cd.go.authorization.google.exceptions.NoSuchRequestHandlerException;
 import cd.go.authorization.google.executors.*;
+import cd.go.authorization.google.jwt.IAPJWTValidator;
 import cd.go.authorization.google.requests.*;
-import cd.go.authorization.google.utils.GoogleIAP;
 
 import com.thoughtworks.go.plugin.api.GoApplicationAccessor;
 import com.thoughtworks.go.plugin.api.GoPlugin;
@@ -36,6 +36,7 @@ import java.util.Map;
 
 @Extension
 public class GooglePlugin implements GoPlugin {
+    private static boolean DEBUG = false;
     private static String PREFIX = "[IAP Auth] ";
     public static final Logger LOG = Logger.getLoggerFor(GooglePlugin.class);
 
@@ -49,16 +50,18 @@ public class GooglePlugin implements GoPlugin {
     @Override
     public GoPluginApiResponse handle(GoPluginApiRequest request) {
         try {
-            System.out.println(PREFIX + "Request Name: " + request.requestName());
-            if (GoogleIAP.hasIAPJWT(request)) {
-                System.out.println(PREFIX + "JWT Request");
+            if (DEBUG) {
+                System.out.println(PREFIX + "Request Name: " + request.requestName());
+                if (request.requestHeaders().get(IAPJWTValidator.JWT_HEADER_KEY) != null) {
+                    System.out.println(PREFIX + "🟢 Request has IAP details");
+                } else {
+                    System.out.println(PREFIX + "🔴 Request does not have IAP details");
+                }
                 String headers = this.mapToString(request.requestHeaders());
                 String params = this.mapToString(request.requestParameters());
                 System.out.println(PREFIX + "Request Headers: " + headers);
                 System.out.println(PREFIX + "Request Params: " + params);
                 System.out.println(PREFIX + "Request Body: " + request.requestBody());
-            } else {
-                System.out.println(PREFIX + "Request does not have IAP details");
             }
 
             switch (RequestFromServer.fromString(request.requestName())) {

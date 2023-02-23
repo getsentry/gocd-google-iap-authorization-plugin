@@ -17,6 +17,7 @@
 package cd.go.authorization.google.requests;
 
 import cd.go.authorization.google.executors.FetchAccessTokenRequestExecutor;
+import cd.go.authorization.google.jwt.IAPJWTValidator;
 import cd.go.authorization.google.models.AuthConfig;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -39,6 +40,6 @@ public class FetchAccessTokenRequest extends Request {
 
     @Override
     public FetchAccessTokenRequestExecutor executor() {
-        return new FetchAccessTokenRequestExecutor(this);
+        return new FetchAccessTokenRequestExecutor(this, new IAPJWTValidator());
     }
 }

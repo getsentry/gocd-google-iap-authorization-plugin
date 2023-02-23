@@ -23,7 +23,6 @@ import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasEntry;
 
 public class GoogleConfigurationTest {
@@ -31,25 +30,19 @@ public class GoogleConfigurationTest {
     @Test
     public void shouldDeserializeGoogleConfiguration() throws Exception {
         final GoogleConfiguration googleConfiguration = GoogleConfiguration.fromJSON("{\n" +
-                "  \"AllowedDomains\": \"example.co.in\",\n" +
-                "  \"ClientId\": \"client-id\",\n" +
-                "  \"ClientSecret\": \"client-secret\"\n" +
+                "  \"Audience\": \"project/123/test\"\n" +
                 "}");
 
-        assertThat(googleConfiguration.allowedDomains(), contains("example.co.in"));
-        assertThat(googleConfiguration.clientId(), is("client-id"));
-        assertThat(googleConfiguration.clientSecret(), is("client-secret"));
+        assertThat(googleConfiguration.audience(), is("project/123/test"));
     }
 
     @Test
     public void shouldSerializeToJSON() throws Exception {
         GoogleConfiguration googleConfiguration = new GoogleConfiguration(
-                "example.co.in", "client-id", "client-secret");
+                "project/123/test");
 
         String expectedJSON = "{\n" +
-                "  \"AllowedDomains\": \"example.co.in\",\n" +
-                "  \"ClientId\": \"client-id\",\n" +
-                "  \"ClientSecret\": \"client-secret\"\n" +
+                "  \"Audience\": \"project/123/test\"\n" +
                 "}";
 
         JSONAssert.assertEquals(expectedJSON, googleConfiguration.toJSON(), true);
@@ -59,12 +52,10 @@ public class GoogleConfigurationTest {
     @Test
     public void shouldConvertConfigurationToProperties() throws Exception {
         GoogleConfiguration googleConfiguration = new GoogleConfiguration(
-                "example.co.in", "client-id", "client-secret");
+                "project/123/test");
 
         final Map<String, String> properties = googleConfiguration.toProperties();
 
-        assertThat(properties, hasEntry("AllowedDomains", "example.co.in"));
-        assertThat(properties, hasEntry("ClientId", "client-id"));
-        assertThat(properties, hasEntry("ClientSecret", "client-secret"));
+        assertThat(properties, hasEntry("Audience", "project/123/test"));
     }
 }

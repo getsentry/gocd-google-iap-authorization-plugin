@@ -16,70 +16,30 @@
 
 package cd.go.authorization.google.models;
 
-import cd.go.authorization.google.GoogleApiClient;
 import cd.go.authorization.google.annotation.ProfileField;
-import cd.go.authorization.google.utils.Util;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 
-import java.util.List;
 import java.util.Map;
 
 import static cd.go.authorization.google.utils.Util.GSON;
 
 public class GoogleConfiguration {
-    private static final String GOOGLE_API_URL = "https://www.googleapis.com";
-
-    @Expose
-    @SerializedName("ClientId")
-    @ProfileField(key = "ClientId", required = true, secure = true)
-    private String clientId;
-
-    @Expose
-    @SerializedName("ClientSecret")
-    @ProfileField(key = "ClientSecret", required = true, secure = true)
-    private String clientSecret;
-
     @Expose
     @SerializedName("Audience")
     @ProfileField(key = "Audience", required = true, secure = true)
     private String audience;
 
-    @Expose
-    @SerializedName("AllowedDomains")
-    @ProfileField(key = "AllowedDomains", required = false, secure = false)
-    private String allowedDomains;
-
-    private GoogleApiClient googleApiClient;
-
     public GoogleConfiguration() {
     }
 
-    public GoogleConfiguration(String allowedDomains, String clientId, String clientSecret) {
-        this.allowedDomains = allowedDomains;
-        this.clientId = clientId;
-        this.clientSecret = clientSecret;
-    }
-
-    public List<String> allowedDomains() {
-        return Util.splitIntoLinesAndTrimSpaces(allowedDomains);
-    }
-
-    public String clientId() {
-        return clientId;
-    }
-
-    public String clientSecret() {
-        return clientSecret;
+    public GoogleConfiguration(String audience) {
+        this.audience = audience;
     }
 
     public String audience() {
         return audience;
-    }
-
-    public String googleApiUrl() {
-        return GOOGLE_API_URL;
     }
 
     public String toJSON() {
@@ -93,13 +53,5 @@ public class GoogleConfiguration {
     public Map<String, String> toProperties() {
         return GSON.fromJson(toJSON(), new TypeToken<Map<String, String>>() {
         }.getType());
-    }
-
-    public GoogleApiClient googleApiClient() {
-        if (googleApiClient == null) {
-            googleApiClient = new GoogleApiClient(this);
-        }
-
-        return googleApiClient;
     }
 }

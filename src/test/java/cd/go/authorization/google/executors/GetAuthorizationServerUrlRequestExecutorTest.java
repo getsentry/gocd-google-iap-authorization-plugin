@@ -16,7 +16,6 @@
 
 package cd.go.authorization.google.executors;
 
-import cd.go.authorization.google.GoogleApiClient;
 import cd.go.authorization.google.exceptions.NoAuthorizationConfigurationException;
 import cd.go.authorization.google.models.AuthConfig;
 import cd.go.authorization.google.models.GoogleConfiguration;
@@ -44,8 +43,6 @@ public class GetAuthorizationServerUrlRequestExecutorTest {
     private AuthConfig authConfig;
     @Mock
     private GoogleConfiguration googleConfiguration;
-    @Mock
-    private GoogleApiClient googleApiClient;
 
     private GetAuthorizationServerUrlRequestExecutor executor;
 
@@ -68,12 +65,11 @@ public class GetAuthorizationServerUrlRequestExecutorTest {
     public void shouldReturnAuthorizationServerUrl() throws Exception {
         when(authConfig.getConfiguration()).thenReturn(googleConfiguration);
         when(request.authConfigs()).thenReturn(Collections.singletonList(authConfig));
-        when(googleConfiguration.googleApiClient()).thenReturn(googleApiClient);
-        when(googleApiClient.authorizationServerUrl(request.callbackUrl())).thenReturn("https://authorization-server-url");
+        when(request.callbackUrl()).thenReturn("https://gocd.example.dev/example.plugin.callback");
 
         final GoPluginApiResponse response = executor.execute();
 
         assertThat(response.responseCode(), is(200));
-        assertThat(response.responseBody(), startsWith("{\"authorization_server_url\":\"https://authorization-server-url\"}"));
+        assertThat(response.responseBody(), startsWith("{\"authorization_server_url\":\"https://gocd.example.dev/example.plugin.callback\"}"));
     }
 }

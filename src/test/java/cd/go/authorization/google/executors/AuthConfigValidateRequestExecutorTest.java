@@ -48,14 +48,6 @@ public class AuthConfigValidateRequestExecutorTest {
 
         String expectedJSON = "[\n" +
                 "  {\n" +
-                "    \"message\": \"ClientId must not be blank.\",\n" +
-                "    \"key\": \"ClientId\"\n" +
-                "  },\n" +
-                "  {\n" +
-                "    \"message\": \"ClientSecret must not be blank.\",\n" +
-                "    \"key\": \"ClientSecret\"\n" +
-                "  },\n" +
-                "  {\n" +
                 "    \"message\": \"Audience must not be blank.\",\n" +
                 "    \"key\": \"Audience\"\n" +
                 "  }\n" +

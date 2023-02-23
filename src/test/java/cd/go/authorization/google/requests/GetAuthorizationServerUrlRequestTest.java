@@ -26,7 +26,6 @@ import org.mockito.Mock;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
@@ -48,9 +47,7 @@ public class GetAuthorizationServerUrlRequestTest {
                 "    {\n" +
                 "      \"id\": \"google-config\",\n" +
                 "      \"configuration\": {\n" +
-                "        \"AllowedDomains\": \"example.com\",\n" +
-                "        \"ClientId\": \"client-id\",\n" +
-                "        \"ClientSecret\": \"client-secret\"\n" +
+                "        \"Audience\": \"project/123/test\"\n" +
                 "      }\n" +
                 "    }\n" +
                 "  ]\n" +
@@ -68,9 +65,7 @@ public class GetAuthorizationServerUrlRequestTest {
         assertThat(request.callbackUrl(), is("https://redirect.url"));
 
         assertThat(authConfig.getId(), is("google-config"));
-        assertThat(authConfig.getConfiguration().allowedDomains(), contains("example.com"));
-        assertThat(authConfig.getConfiguration().clientId(), is("client-id"));
-        assertThat(authConfig.getConfiguration().clientSecret(), is("client-secret"));
+        assertThat(authConfig.getConfiguration().audience(), is("project/123/test"));
 
     }
 }

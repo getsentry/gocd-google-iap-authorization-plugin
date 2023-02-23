@@ -47,9 +47,7 @@ public class FetchAccessTokenRequestTest {
                 "    {\n" +
                 "      \"id\": \"google-auth-config\",\n" +
                 "      \"configuration\": {\n" +
-                "        \"AllowedDomains\": \"example.co.in\",\n" +
-                "        \"ClientId\": \"client-id\",\n" +
-                "        \"ClientSecret\": \"client-secret\"\n" +
+                "        \"Audience\": \"project/123/test\"\n" +
                 "      }\n" +
                 "    }\n" +
                 "  ]\n" +
@@ -64,8 +62,6 @@ public class FetchAccessTokenRequestTest {
 
         final AuthConfig authConfig = request.authConfigs().get(0);
         assertThat(authConfig.getId(), is("google-auth-config"));
-        assertThat(authConfig.getConfiguration().allowedDomains(), contains("example.co.in"));
-        assertThat(authConfig.getConfiguration().clientId(), is("client-id"));
-        assertThat(authConfig.getConfiguration().clientSecret(), is("client-secret"));
+        assertThat(authConfig.getConfiguration().audience(), is("project/123/test"));
     }
 }
