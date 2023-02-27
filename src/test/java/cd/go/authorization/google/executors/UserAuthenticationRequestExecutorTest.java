@@ -16,19 +16,19 @@
 
 package cd.go.authorization.google.executors;
 
-import cd.go.authorization.google.GoogleApiClient;
-import cd.go.authorization.google.GoogleUser;
 import cd.go.authorization.google.exceptions.NoAuthorizationConfigurationException;
+import cd.go.authorization.google.jwt.JWTValidation;
+import cd.go.authorization.google.jwt.JWTValidator;
 import cd.go.authorization.google.models.AuthConfig;
 import cd.go.authorization.google.models.GoogleConfiguration;
-import cd.go.authorization.google.models.TokenInfo;
+import cd.go.authorization.google.models.IAPJwt;
 import cd.go.authorization.google.requests.UserAuthenticationRequest;
+
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.skyscreamer.jsonassert.JSONAssert;
-
 import java.util.Collections;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -38,7 +38,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 
 public class UserAuthenticationRequestExecutorTest {
-
+    private static String JWT_AUDIENCE = "project/123/test";
     @Mock
     private UserAuthenticationRequest request;
     @Mock
@@ -46,17 +46,17 @@ public class UserAuthenticationRequestExecutorTest {
     @Mock
     private GoogleConfiguration googleConfiguration;
     @Mock
-    private GoogleApiClient googleApiClient;
+    private JWTValidator validator;
+
     private UserAuthenticationRequestExecutor executor;
 
     @BeforeEach
     public void setUp() throws Exception {
         openMocks(this);
 
+        when(googleConfiguration.audience()).thenReturn(JWT_AUDIENCE);
         when(authConfig.getConfiguration()).thenReturn(googleConfiguration);
-        when(googleConfiguration.googleApiClient()).thenReturn(googleApiClient);
-
-        executor = new UserAuthenticationRequestExecutor(request);
+        executor = new UserAuthenticationRequestExecutor(request, validator);
     }
 
     @Test
@@ -68,12 +68,26 @@ public class UserAuthenticationRequestExecutorTest {
     }
 
     @Test
-    public void shouldAuthenticate() throws Exception {
-        final TokenInfo tokenInfo = new TokenInfo("31239032-xycs.xddasdasdasda", 7200, "foo-type", "refresh-xysaddasdjlascdas");
+    public void shouldNotAuthenticate() throws Exception {
+        final IAPJwt creds = new IAPJwt("a.bad.jwt");
 
         when(request.authConfigs()).thenReturn(Collections.singletonList(authConfig));
-        when(request.tokenInfo()).thenReturn(tokenInfo);
-        when(googleApiClient.userProfile(tokenInfo)).thenReturn(new GoogleUser("foo@bar.com", "Foo Bar"));
+        when(request.credentials()).thenReturn(creds);
+        when(validator.validate("a.bad.jwt", JWT_AUDIENCE)).thenReturn(new JWTValidation(false, "foo@bar.com"));
+
+        final GoPluginApiResponse response = executor.execute();
+
+        assertThat(response.responseCode(), is(400));
+        JSONAssert.assertEquals("Invalid IAP request", response.responseBody(), true);
+    }
+
+    @Test
+    public void shouldAuthenticate() throws Exception {
+        final IAPJwt creds = new IAPJwt("a.good.jwt");
+
+        when(request.authConfigs()).thenReturn(Collections.singletonList(authConfig));
+        when(request.credentials()).thenReturn(creds);
+        when(validator.validate("a.good.jwt", JWT_AUDIENCE)).thenReturn(new JWTValidation(true, "foo@bar.com"));
 
         final GoPluginApiResponse response = executor.execute();
 
@@ -81,7 +95,7 @@ public class UserAuthenticationRequestExecutorTest {
                 "  \"roles\": [],\n" +
                 "  \"user\": {\n" +
                 "    \"username\": \"foo@bar.com\",\n" +
-                "    \"display_name\": \"Foo Bar\",\n" +
+                "    \"display_name\": \"\",\n" +
                 "    \"email\": \"foo@bar.com\"\n" +
                 "  }\n" +
                 "}";

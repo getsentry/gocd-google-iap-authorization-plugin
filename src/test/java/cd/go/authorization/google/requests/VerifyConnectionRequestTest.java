@@ -26,7 +26,6 @@ import org.mockito.Mock;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 
@@ -43,9 +42,7 @@ public class VerifyConnectionRequestTest {
     public void shouldDeserializeGoPluginApiRequestToVerifyConnectionRequest() throws Exception {
         String responseBody = "{\n" +
                 "  \"GoServerUrl\": \"https://your.go.server.url\",\n" +
-                "  \"AllowedDomains\": \"example.com\",\n" +
-                "  \"ClientId\": \"client-id\",\n" +
-                "  \"ClientSecret\": \"client-secret\"\n" +
+                "  \"Audience\": \"project/123/test\"\n" +
                 "}";
 
         when(apiRequest.requestBody()).thenReturn(responseBody);
@@ -55,9 +52,7 @@ public class VerifyConnectionRequestTest {
 
         assertThat(request.executor(), instanceOf(VerifyConnectionRequestExecutor.class));
 
-        assertThat(googleConfiguration.allowedDomains(), contains("example.com"));
-        assertThat(googleConfiguration.clientId(), is("client-id"));
-        assertThat(googleConfiguration.clientSecret(), is("client-secret"));
+        assertThat(googleConfiguration.audience(), is("project/123/test"));
     }
 
 }

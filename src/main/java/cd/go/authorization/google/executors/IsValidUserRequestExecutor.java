@@ -4,10 +4,6 @@ import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import cd.go.authorization.google.requests.IsValidUserRequest;
 
-import static cd.go.authorization.google.GooglePlugin.LOG;
-
-import java.util.Map;
-
 public class IsValidUserRequestExecutor implements RequestExecutor {
   private final IsValidUserRequest request;
 
@@ -17,8 +13,18 @@ public class IsValidUserRequestExecutor implements RequestExecutor {
 
   @Override
   public GoPluginApiResponse execute() throws Exception {
-    // TODO: Verify the IAP JWT headers.
-    // See https://cloud.google.com/iap/docs/signed-headers-howto
+    // TODO: When/if GoCD supports passing in the request headers
+    // for this request, we should validate the IAP header.
+    /*
+    JWTValidation validation = validator.validate(
+      jwt,
+      this.request.authConfigs().get(0).getConfiguration().audience()
+    );
+    if (!validation.isValid()) {
+      return DefaultGoPluginApiResponse.badRequest("Invalid IAP request");
+    }
+    */
+
     return DefaultGoPluginApiResponse.success("");
   }
 }

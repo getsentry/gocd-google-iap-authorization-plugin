@@ -29,8 +29,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static cd.go.authorization.google.GooglePlugin.LOG;
-
 public class VerifyConnectionRequestExecutor implements RequestExecutor {
     private static final Gson GSON = new Gson();
     private final VerifyConnectionRequest request;
@@ -60,13 +58,6 @@ public class VerifyConnectionRequestExecutor implements RequestExecutor {
 
     private ValidationResult verifyConnection(GoogleConfiguration configuration) {
         final ValidationResult result = new ValidationResult();
-
-        try {
-            configuration.googleApiClient().verifyConnection();
-        } catch (Exception e) {
-            result.addError(new ValidationError(e.getMessage()));
-            LOG.error("[Verify Connection] Verify connection failed with errors.", e);
-        }
         return result;
     }
 

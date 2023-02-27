@@ -16,10 +16,9 @@
 
 package cd.go.authorization.google.executors;
 
-import cd.go.authorization.google.GoogleApiClient;
-import cd.go.authorization.google.GoogleUser;
 import cd.go.authorization.google.exceptions.NoAuthorizationConfigurationException;
-import cd.go.authorization.google.models.GoogleConfiguration;
+import cd.go.authorization.google.jwt.JWTValidation;
+import cd.go.authorization.google.jwt.JWTValidator;
 import cd.go.authorization.google.models.User;
 import cd.go.authorization.google.requests.UserAuthenticationRequest;
 import com.google.gson.Gson;
@@ -30,15 +29,14 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import static cd.go.authorization.google.GooglePlugin.LOG;
-import static java.text.MessageFormat.format;
-
 public class UserAuthenticationRequestExecutor implements RequestExecutor {
     private static final Gson GSON = new Gson();
     private final UserAuthenticationRequest request;
+    private JWTValidator validator;
 
-    public UserAuthenticationRequestExecutor(UserAuthenticationRequest request) {
+    public UserAuthenticationRequestExecutor(UserAuthenticationRequest request, JWTValidator validator) {
         this.request = request;
+        this.validator = validator;
     }
 
     @Override
@@ -47,20 +45,18 @@ public class UserAuthenticationRequestExecutor implements RequestExecutor {
             throw new NoAuthorizationConfigurationException("[Authenticate] No authorization configuration found.");
         }
 
-        final GoogleConfiguration configuration = request.authConfigs().get(0).getConfiguration();
-        final GoogleApiClient googleApiClient = configuration.googleApiClient();
-        final GoogleUser googleUser = googleApiClient.userProfile(request.tokenInfo());
+        JWTValidation validation = validator.validate(
+            this.request.credentials().jwt(),
+            this.request.authConfigs().get(0).getConfiguration().audience()
+        );
 
-        if (configuration.allowedDomains().isEmpty() || configuration.allowedDomains().contains(googleUser.getHd())) {
-
-            Map<String, Object> userMap = new HashMap<>();
-            userMap.put("user", new User(googleUser));
-            userMap.put("roles", Collections.emptyList());
-
-            return DefaultGoPluginApiResponse.success(GSON.toJson(userMap));
+        if (!validation.isValid()) {
+            return DefaultGoPluginApiResponse.badRequest("Invalid IAP request");
         }
 
-        LOG.warn(format("[Authenticate] User `{0}` is not belongs to allowed domain list.", googleUser.getEmail()));
-        return DefaultGoPluginApiResponse.error(format("[Authenticate] User `{0}` is not belongs to allowed domain list.", googleUser.getEmail()));
+        Map<String, Object> userMap = new HashMap<>();
+        userMap.put("user", new User(validation.email(), "", validation.email()));
+        userMap.put("roles", Collections.emptyList());
+        return DefaultGoPluginApiResponse.success(GSON.toJson(userMap));
     }
 }

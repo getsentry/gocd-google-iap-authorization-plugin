@@ -55,9 +55,7 @@ public class UserAuthenticationRequestTest {
                 "    {\n" +
                 "      \"id\": \"google-config\",\n" +
                 "      \"configuration\": {\n" +
-                "        \"ClientId\": \"client-id\",\n" +
-                "        \"AllowedDomains\": \"example.com\",\n" +
-                "        \"ClientSecret\": \"client-secret\"\n" +
+                "        \"Audience\": \"project/123/test\"\n" +
                 "      }\n" +
                 "    }\n" +
                 "  ]\n" +
@@ -73,8 +71,6 @@ public class UserAuthenticationRequestTest {
         final AuthConfig authConfig = request.authConfigs().get(0);
 
         assertThat(authConfig.getId(), is("google-config"));
-        assertThat(authConfig.getConfiguration().clientId(), is("client-id"));
-        assertThat(authConfig.getConfiguration().clientSecret(), is("client-secret"));
-        assertThat(authConfig.getConfiguration().allowedDomains(), containsInAnyOrder("example.com"));
+        assertThat(authConfig.getConfiguration().audience(), is("project/123/test"));
     }
 }

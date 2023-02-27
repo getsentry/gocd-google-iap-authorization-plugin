@@ -16,11 +16,13 @@
 
 package cd.go.authorization.google.executors;
 
-import cd.go.authorization.google.GoogleApiClient;
 import cd.go.authorization.google.exceptions.NoAuthorizationConfigurationException;
+import cd.go.authorization.google.jwt.IAPJWTValidator;
+import cd.go.authorization.google.jwt.JWTValidation;
+import cd.go.authorization.google.jwt.JWTValidator;
 import cd.go.authorization.google.models.AuthConfig;
 import cd.go.authorization.google.models.GoogleConfiguration;
-import cd.go.authorization.google.models.TokenInfo;
+import cd.go.authorization.google.models.IAPJwt;
 import cd.go.authorization.google.requests.FetchAccessTokenRequest;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,6 +31,8 @@ import org.mockito.Mock;
 import org.skyscreamer.jsonassert.JSONAssert;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -40,11 +44,11 @@ public class FetchAccessTokenRequestExecutorTest {
     @Mock
     private FetchAccessTokenRequest request;
     @Mock
+    private JWTValidator validator;
+    @Mock
     private AuthConfig authConfig;
     @Mock
     private GoogleConfiguration googleConfiguration;
-    @Mock
-    private GoogleApiClient googleApiClient;
     private FetchAccessTokenRequestExecutor executor;
 
     @BeforeEach
@@ -52,9 +56,8 @@ public class FetchAccessTokenRequestExecutorTest {
         openMocks(this);
 
         when(authConfig.getConfiguration()).thenReturn(googleConfiguration);
-        when(googleConfiguration.googleApiClient()).thenReturn(googleApiClient);
 
-        executor = new FetchAccessTokenRequestExecutor(request);
+        executor = new FetchAccessTokenRequestExecutor(request, validator);
     }
 
     @Test
@@ -66,25 +69,46 @@ public class FetchAccessTokenRequestExecutorTest {
     }
 
     @Test
-    public void shouldFetchAccessToken() throws Exception {
-        final TokenInfo tokenInfo = new TokenInfo("31239032-xycs.xddasdasdasda", 7200, "foo-type", "refresh-xysaddasdjlascdas");
-
+    public void shouldFailWhenNoHeader() throws Exception {
         when(request.authConfigs()).thenReturn(Collections.singletonList(authConfig));
-        when(request.requestParameters()).thenReturn(Collections.singletonMap("code", "code-received-in-previous-step"));
-        when(googleApiClient.fetchAccessToken(request.requestParameters())).thenReturn(tokenInfo);
+        when(request.requestHeaders()).thenReturn(new HashMap<>());
+
+        final GoPluginApiResponse response = executor.execute();
+
+        assertThat(response.responseCode(), is(400));
+        assertThat(response.responseBody(), is("Invalid IAP request"));
+    }
+
+    @Test
+    public void shouldFailWhenIvalidJWTHeader() throws Exception {
+        when(request.authConfigs()).thenReturn(Collections.singletonList(authConfig));
+        Map<String, String> headers = new HashMap<>();
+        headers.put(IAPJWTValidator.JWT_HEADER_KEY, "A bad jwt");
+        when(request.requestHeaders()).thenReturn(headers);
+        when(validator.validate("A bad jwt", authConfig.getConfiguration().audience())).thenReturn(new JWTValidation(false, null));
+
+        final GoPluginApiResponse response = executor.execute();
+
+        assertThat(response.responseCode(), is(400));
+        assertThat(response.responseBody(), is("Invalid IAP request"));
+    }
+
+    @Test
+    public void shouldReturnJWT() throws Exception {
+        when(request.authConfigs()).thenReturn(Collections.singletonList(authConfig));
+        Map<String, String> headers = new HashMap<>();
+        headers.put(IAPJWTValidator.JWT_HEADER_KEY, "a.good.jwt");
+        when(request.requestHeaders()).thenReturn(headers);
+        when(validator.validate("a.good.jwt", authConfig.getConfiguration().audience())).thenReturn(new JWTValidation(true, "foo@bar.com"));
 
         final GoPluginApiResponse response = executor.execute();
 
 
         final String expectedJSON = "{\n" +
-                "  \"access_token\": \"31239032-xycs.xddasdasdasda\",\n" +
-                "  \"expires_in\": 7200,\n" +
-                "  \"token_type\": \"foo-type\",\n" +
-                "  \"refresh_token\": \"refresh-xysaddasdjlascdas\"\n" +
+                "  \"jwt\": \"a.good.jwt\"\n" +
                 "}";
 
-        /* assertThat(response.responseCode(), is(200));
-        JSONAssert.assertEquals(expectedJSON, response.responseBody(), true);*/
-        assertThat(response.responseCode(), is(400));
+        assertThat(response.responseCode(), is(200));
+        JSONAssert.assertEquals(expectedJSON, response.responseBody(), true);
     }
 }
